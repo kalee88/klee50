@@ -1,53 +1,34 @@
-# Kevin Lin
-# Death Row Coders
-# SoftDev
-# K09 <CSV file parsing, flask, displaying to HTML>
-# 2024-9-24
-# Time Spent : 0.5 Hours
+'''
+Sascha Gordon-Zolov, Kyle Lee, John (JAKS)
+SoftDev
+K09 -- Softserve -- Using Flask import to create a list with a randomly changing occupation
+2024-09-24
+time spent: 2 hours
+'''
 
-import random
+from flask import Flask # imports the flask command
 import csv
-from flask import Flask
+import random
 
-app = Flask(__name__)
+def randomSelec():
+    def finalPage():
+    page = "<h1>Sascha Gordon-Zolov, Kyle Lee, John (JAKS)</h1><br><h3>Occupations:<\h3><br>"
+    with open("occupations.csv", "r") as file:
+        next(file)
+        f = csv.reader(file)
+        dic = {}
+        for i in f:
+            dic.update({i[0]: float(i[1])})
+        total = dic["Total"]
+        key = dic.keys()
+        for k in key:
+            num = dic[k]
+            if (num / total) > random.random(): #random.random generates a float in (0, 1)
+                thing = k
+            else:
+                total -= num #Used for weighted probability; subtracts the probability from the total if the occupation is not chosen
+    for stuff in dic.keys():
+        page = page + stuff + "<br>"
+    return page + "<br><h4>Random Occupation: " + thing + "</h4><br>"
 
-def readfile(f):
-    d = {}
-    with open (f, 'r') as listfile:
-        reader = csv.reader(listfile)
-        next(reader)
-        for row in reader:
-            job = row[0]
-            if job == "Total":
-                continue
-            percent = float(row[1])
-            d[job] = percent
-    return d
-        
-        
-def sel(d):
-    return random.choices(list(d.keys()), weights=d.values(), k=1)[0]
-
-@app.route("/")
-
-def page():
-    occ = sel(readfile("occupations.csv"))
-    code = """
-    <!DOCTYPE html>
-    <html>
-      <body>
-            <p>Death Row Coders with Raymond, Christopher, and Kevin.</p>
-            <h1>This time: """ + occ + """
-            <h2>Occupations</h2>
-    """
-    for a, b in readfile("occupations.csv").items():
-        print(a)
-        print(b)
-        code += "<li>" + a + ": " + str(b) + "</li>"
-
-    code += "</body></html>"
-    return code
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run()
+app.run()
