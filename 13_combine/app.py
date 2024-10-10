@@ -66,6 +66,7 @@ def test_tmplt():
     percentoccupations = []
     linkoccupations = []
     tableoccupations = []
+    tableoccupations.append("<table>")
     rando = randomoccupation()
     count = 0
     for z in occupations:
@@ -79,7 +80,7 @@ def test_tmplt():
         tableoccupations.append(listoccupations[x])
         tableoccupations.append(percentoccupations[x])
         tableoccupations.append(linkoccupations[x])
-        
+    tableoccupations.append("</table>")    
     return render_template('tablified.html', foo="randomTableOccupations", oogada= "Jonathan Metzler-Kyle Lee-Suhana Kumar - MLK", boogada=rando, collection=tableoccupations)
 
 
