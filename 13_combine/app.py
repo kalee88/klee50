@@ -1,3 +1,4 @@
+
 # Jonathan Metzler-Kyle Lee-Suhana Kumar - MLK
 # SoftDev
 # Sep 2024
@@ -47,13 +48,13 @@ def randomoccupation():
     total = 0
     count = 0
     listoccupations = []
-    for z in occupations:
-        listoccupations.append(z)
-    for i in occupations.values():
+    for occupation in occupations:
+        listoccupations.append(occupation)
+    for percentage in occupations.values():
         if (total > rando_number):
             x = listoccupations[count]
         else:
-            total += i*10
+            total += percentage*10
             count+=1
     return x
 
@@ -62,26 +63,17 @@ def test_tmplt():
     #starts the table
     occupations = readerocc()
     occupationlink = linkjobs("data/occupations.csv")
-    listoccupations = []
-    percentoccupations = []
-    linkoccupations = []
     tableoccupations = []
-    tableoccupations.append("<table>")
     rando = randomoccupation()
     count = 0
-    for z in occupations:
-        listoccupations.append("<tr> <td>" + z + "</td>")
-        count+=1
-    for i in occupations.values():
-        percentoccupations.append("<td>" + str(i) + "</td>")
-    for m in occupationlink:
-        linkoccupations.append("<td>" + m + "</td> </tr>")
-    for x in range(count):
-        tableoccupations.append(listoccupations[x])
-        tableoccupations.append(percentoccupations[x])
-        tableoccupations.append(linkoccupations[x])
-    tableoccupations.append("</table>")    
+    
+    for occupation, percentage, link in zip(occupations.keys(), occupations.values(), occupationlink):
+        # Create a table row for each occupation with percentage and link
+        row = f"<tr><td>{occupation}</td><td>{percentage}</td><td><a href='{link}'>{link}</a></td></tr>"
+        tableoccupations.append(row)
+        
     return render_template('tablified.html', foo="randomTableOccupations", oogada= "Jonathan Metzler-Kyle Lee-Suhana Kumar - MLK", boogada=rando, collection=tableoccupations)
+
 
 
 if __name__ == "__main__":
