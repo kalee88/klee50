@@ -1,10 +1,12 @@
-""" simple all-in-one flask app with session handling
-"""
+#Kyle Lee
+#K^3 (Kyle, Suhana, Vedant)
+#SoftDev
+#K6 -- Reading Files
+#2024-09-18
+#time spent: .75
 
-#adapted from
-# https://flask.palletsprojects.com/en/3.0.x/quickstart/#sessions
-
-
+import os
+from flask import render_template
 from flask import Flask
 from flask import session
 from flask import request
@@ -14,31 +16,31 @@ from flask import url_for
 app = Flask(__name__)
 
 # Set the secret key to some random bytes. Keep this really secret!
-app.secret_key = b'qwrqwsxolwcbuytr_5#y2L"ujedcF4Qsdfastiugyhkb8z\nasdf\xecgb;lkiy]/'
+app.secret_key = os.urandom(32)
 
 @app.route('/')
 def index():
     if 'username' in session:
-        return f'Logged in as {session["username"]}'
-    return 'You are not logged in'
+        return redirect("/response.html")
+    return render_template( 'login.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    method1 = request.method
     if request.method == 'POST':
-        session['username'] = request.form['username']
-        return redirect(url_for('index'))
-    return '''
-        <form method="post">
-            <p><input type=text name=username>
-            <p><input type=submit value=Login>
-        </form>
-    '''
+        username = request.form['username']
+        requesttype = "POST"
+    else:
+        username = request.args.get('username')
+        requesttype = "GET"
+    
+    return render_template( 'response.html', username=username, request = requesttype )
 
 @app.route('/logout')
 def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
-    return redirect(url_for('index'))
+    return render_template( 'logout.html')
 
 
 if __name__ == "__main__":      # true if this file NOT imported
