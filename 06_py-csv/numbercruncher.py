@@ -12,11 +12,11 @@ def Program():
         csvFile = csv.reader(file)
         info = {}
         count = 0
-        rando_number = random.randint(0,998)
+        rando_number = random.randint(0,998) #Get a random number in scale with job percentages such that there are no decimals 
         total = 0
         for lines in csvFile:
             if not(count == 0):
-                if (total > rando_number):
+                if (total > rando_number): #If we gone above the desired value from this step, this means that we reached our desired job
                     print(lines[0])
                     return(lines[0])
                 else:

@@ -1,48 +1,49 @@
-#Kyle Lee
-#K^3 (Kyle, Suhana, Vedant)
-#SoftDev
-#K6 -- Reading Files
-#2024-09-18
-#time spent: .75
+""" simple all-in-one flask app with session handling
+"""
 
-import os
-from flask import render_template
-from flask import Flask
-from flask import session
-from flask import request
-from flask import redirect
-from flask import url_for
+'''
+Kyle Lee, Vedant Kothari, Suhana Kumar
+Team Name: K^3
+K16 - Take and Keep
+2024-10-14
+'''
+
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
-
-# Set the secret key to some random bytes. Keep this really secret!
-app.secret_key = os.urandom(32)
+app.secret_key = 'conortoglory'
+T_name = "K^3"
+roster = ["Kyle Lee, Vedant Kothari, Suhana Kumar"]
 
 @app.route('/')
-def index():
+def primary():
+    if 'username' in session: #Checks if there is an active session currently
+        return redirect(url_for('submit'))
+    return render_template('submit.html',T_name=T_name,roster=roster) #Renders submit.html on the page if there is no active session
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    username = request.form.get('username')
+    session['username'] = username #Stores username in a session
+    return redirect(url_for('welcome'))
+
+@app.route('/welcome')
+def welcome():
     if 'username' in session:
-        return redirect("/response.html")
-    return render_template( 'login.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    method1 = request.method
-    if request.method == 'POST':
-        username = request.form['username']
-        requesttype = "POST"
+        username = session['username']
+        greeting = "Hey there "+username+". We hope you like this page" #Returns greeting once user submits username or is already logged in
+        method_used = request.method
+        explanation = '''
+        This is a flask app which checks if you login via a correct username. You will be logged in until you click logout. The app stores sessions via cookies, and the session cookie is sent to your browser.
+        '''
+        return render_template('response.html', username=username, method=method_used, greeting=greeting, explanation=explanation, T_name=T_name,roster=roster)
     else:
-        username = request.args.get('username')
-        requesttype = "GET"
-    
-    return render_template( 'response.html', username=username, request = requesttype )
+        return redirect(url_for('primary'))
 
-@app.route('/logout')
-def logout():
-    # remove the username from the session if it's there
-    session.pop('username', None)
-    return render_template( 'logout.html')
+@app.route('/unsubmit')
+def unsubmit():
+    username = session.pop('username', None) #Removes user from session
+    return render_template('unsubmit.html', T_name=T_name, roster=roster)
 
-
-if __name__ == "__main__":      # true if this file NOT imported
-    app.debug = True            # enable auto-reload upon code change
-    app.run()
+if __name__ == '__main__':
+    app.run(debug=True)

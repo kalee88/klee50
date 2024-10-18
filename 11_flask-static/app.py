@@ -1,4 +1,4 @@
-# Clyde 'Thluffy' Sinclair
+# Kyle Lee (K^3 : Kyle Lee, Vedant Kothari, Suhana Kumar)
 # SoftDev
 # Sep 2024
 

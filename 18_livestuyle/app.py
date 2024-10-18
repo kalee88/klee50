@@ -1,8 +1,9 @@
-# K^3 : Kyle Lee, Suhana Kumar, Vedent Kothari
-# SoftDev
-# Oct 16th 2024
-# DEMO
-# basics of /static folder
+'''
+Kyle Lee, Vedant Kothari, Suhana Kumar
+Team Name: K^3
+K18 - Serving Looks
+2024-10-16
+'''
 
 from flask import Flask             #facilitate flask webserving
 from flask import render_template   #facilitate jinja templating
