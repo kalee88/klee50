@@ -1,4 +1,4 @@
-#Clyde "Thluffy" Sinclair
+#K^3 : Kyle Lee, Suhana Kumar, Vedent Kothari
 #SoftDev
 #skeleton/stub :: SQLITE3 BASICS
 #Oct 2024
@@ -15,11 +15,30 @@ c = db.cursor()               #facilitate db ops -- you will use cursor to trigg
 #==========================================================
 
 
-"""
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-< < < INSERT YOUR TEAM'S DB-POPULATING CODE HERE > > >
+tableCourse = "<table><tr><th>code</th><th>mark</th><th>id</th></tr>"
+tableName = "<table><tr><th>name</th><th>age</th><th>id</th></tr>"
+with open('courses.csv', newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        tableCourse += "<tr>"
+        tableCourse += "<td>" + row['code'] + "</td>"
+        tableCourse += "<td>" + row['mark'] + "</td>"
+        tableCourse += "<td>" + row['id'] + "</td>"
+        tableCourse += "</tr>"
+with open('students.csv', newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        tableName += "<tr>"
+        tableName += "<td>" + row['name'] + "</td>"
+        tableName += "<td>" + row['age'] + "</td>"
+        tableName += "<td>" + row['id'] + "</td>"
+        tableName += "</tr>"
+        
+        
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-"""
+
 
 command = ""          # test SQL stmt in sqlite3 shell, save as string
 c.execute(command)    # run SQL statement
