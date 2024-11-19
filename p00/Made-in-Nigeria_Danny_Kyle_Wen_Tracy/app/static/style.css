@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nanum+Pen+Script&family=Roboto+Slab&display=swap');
+p {font-family: 'Roboto Slab', serif;}
+
+
+html {
+    background-color: #F5F2F0;
+}
+
+body {
+    font-family: Garamond;
+    background-color: #FEFBFA;
+    margin: 20px;
+    border-radius: 25px;
+    font-size: 30px;
+    color: #3E592B
+}
+
+.main{
+    padding-left: 700px;
+}
+
+h1 {
+    color: #3D562B;
+    font-size:55px;
+    font-family: "Garamond";
+    padding: 20px;
+    text-align: center;
+    font-style: italic; 
+    font-weight: bold;
+    background-color: #C8D6BE;
+    border-radius: 25px;
+}
+
+
+button {
+    font-size: 20px;
+    color: #3E592B;
+    background-color: #BBC0B8;
+    border: 1px solid #000000;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 15px;
+}
+
+button:hover {
+    background-color: #3E592B;
+    color: white;
+  }
+
+.flash-message {
+background-color: #f8d7da;
+color: #721c24; 
+padding: 10px;
+border: 1px solid #f5c6cb;
+border-radius: 5px;
+margin: 10px 0;
+font-size: 16px;
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'style.css') }}">
+    <title> Edit Page </title>
+</head>
+
+<body>
+
+    Edit Entry {{entry[0][0]}}
+    
+    <br><br>
+    
+    <form method="post">
+        <input type="text" id="entryTitle" value = "{{entry[0][1]}}" name="entryTitle" required>
+        <br>
+        <br>
+        <textarea id="entryContent" name="entryContent" required>"{{entry[0][2]}}"</textarea>
+        <br>
+        <button type="submit">Edit Entry</button>
+    </form>
+
+</body>
+
+</html>

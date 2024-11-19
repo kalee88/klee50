@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'style.css') }}">
+    <title> Dashboard </title>
+</head>
+
+<body>
+
+    User's dashboard
+    <br><br>
+    {{ uname }}
+    
+    <br><br>
+    
+    <form action="/logout">
+        <input type="submit" value="Log Out" name="log Out">
+    </form>
+    
+    <br>
+    
+    <form action="/">
+        <input type="submit" value="Return Home" name="Return Home">
+    </form>
+    
+    <br>
+    
+    <form action= "/view">
+        <input type="submit" value="All blogs" name="submit">
+    </form>
+    
+    <br>
+    
+    <form action= "/create">
+        Make a new blog: <input type="submit" value="Create Blog" name="submit">
+    </form>
+    
+</body>
+
+</html>

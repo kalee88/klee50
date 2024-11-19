@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'style.css') }}">
+    <title>Create Blogs</title>
+</head>
+<body>
+    <h1>Create New Blog</h1>
+    <h2>Owner: {{ uname }}</h2>
+    
+    <form action="/create" method="post">
+        Title of blog: <input type="text" id="blog_title" name="blog_title" required>
+        <input type="submit" value='Create Blog'>
+    </form>
+    
+    <br>
+    
+    <form action="/logout" method="post">
+        <button type="submit">Log Out</button>
+    </form>
+    
+    <br>
+    
+    <form action="/" method="get">
+        <button type="submit">Return Home</button>
+    </form>
+</body>
+</html>

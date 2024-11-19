@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'style.css') }}">
+    <title>View Blogs</title>
+</head>
+<body>
+    <h1>Viewing Page</h1>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p class="flash-message">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <br><br>
+
+    <form action="/" method="get">
+        <button type="submit">Return Home</button>
+    </form>
+
+    <br><br>
+
+    {% if blogs|length > 0 %}
+        {% for owner, blogtitle in blogs %}
+            <div>
+                <form method="get" action="/view/{{ owner }}/{{ blogtitle }}">
+                    <button type="submit" id = "blogtitle" value = "{{blogtitle}}">{{ owner }} - {{ blogtitle }}</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No blogs found.</p>
+    {% endif %}
+
+</body>
+</html>
