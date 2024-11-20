@@ -20,3 +20,11 @@ q0b (Team Everything Bagel- Tailwind):
 
 q1:  
 Tailwind's built in css is much more intuitive and seems more versatile. However, I don't like how tailwind removes all the default stylizations (like h1 won't make the text large and bold) and turns everything into an empty div. 
+
+q0 (Team JK - Foundation):
+  0
+
+q0b (Team JK - Foundation):
+
+q1:  
+I found Foundation to be more useful than bootstrap. I felt that the html tags were more intuitive and didn't try to throw a ton of difficult features at us like the dropdown bar
