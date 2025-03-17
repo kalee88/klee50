@@ -1,0 +1,14 @@
+log.txt:
+
+We had to tell copilot to put all the python text into just __init__.py, but it originally didn't work.
+Copilot detects vulnerabilities, like unvalidated URL redirection and hardcoded credentials.
+It also used a lot of imports that are unknown to us, like Bcrypt.
+Copilot prefers to write code very neatly but also shortly, and doesn't like to blabber much unlike ChatGPT.
+Code broke within the shell.
+It had given the wrong requirements for pip installation
+Issue where requirements is not completely updated and is not 100% the same as the imports
+Started hallucinating folders and python files that are not in the folder
+Keeps going in circles
+We removed SQLAlchemy and created a new code sample
+For some time copilot just ignored the repository we had. 
+Finally, the copilot gave us code (after forgetting the code to run the app), and it worked up to registration, where it forgot to create the user database.
