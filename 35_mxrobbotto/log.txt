@@ -1,3 +1,16 @@
+# Kyle Lee, Andy Shyklo
+# Team Salk
+# SoftDev
+# Hours 3.5
+# 2024-1-10
+
+Q/C/C:
+some areas of interest...
+q0: How many tries did it take to "get it right?" 10-15 Tries just to get it running
+q1: Did you catch any errors? If so, how did you notice, and what did you do? It did catch errors mostly for pip install requirements although it struggled heavily to resolve them.
+q2: How similar or different is the bot's output to that of your past self / old team? At first not very similar as copilot had a ton of uncleared packages however as we went on we told copilot to use less packages as they caused a ton of errors.
+
+
 log.txt:
 
 We had to tell copilot to put all the python text into just __init__.py, but it originally didn't work.
