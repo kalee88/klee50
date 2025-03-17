@@ -1,5 +1,5 @@
+import sqlite3
 from flask import Flask, render_template, url_for, flash, redirect, request
-from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
 from flask_wtf import FlaskForm
@@ -9,40 +9,32 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
+def get_db_connection():
+    conn = sqlite3.connect('site.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM user WHERE id = ?', (user_id,)).fetchone()
+    conn.close()
+    if user:
+        return User(user['id'], user['username'], user['email'], user['image_file'], user['password'])
+    return None
 
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-    password = db.Column(db.String(60), nullable=False)
-    stories = db.relationship('Story', backref='author', lazy=True)
-    contributions = db.relationship('Contribution', backref='contributor', lazy=True)
-
-class Story(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    content = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    contributions = db.relationship('Contribution', backref='story', lazy=True)
-
-class Contribution(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text, nullable=False)
-    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    story_id = db.Column(db.Integer, db.ForeignKey('story.id'), nullable=False)
+class User(UserMixin):
+    def __init__(self, id, username, email, image_file, password):
+        self.id = id
+        self.username = username
+        self.email = email
+        self.image_file = image_file
+        self.password = password
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -52,12 +44,16 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Sign Up')
 
     def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM user WHERE username = ?', (username.data,)).fetchone()
+        conn.close()
         if user:
             raise ValidationError('That username is taken. Please choose a different one.')
 
     def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM user WHERE email = ?', (email.data,)).fetchone()
+        conn.close()
         if user:
             raise ValidationError('That email is already in use. Please choose a different one.')
 
@@ -79,7 +75,9 @@ class ContributionForm(FlaskForm):
 @app.route("/home")
 @login_required
 def home():
-    stories = Story.query.all()
+    conn = get_db_connection()
+    stories = conn.execute('SELECT * FROM story').fetchall()
+    conn.close()
     return render_template('home.html', stories=stories)
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -89,9 +87,11 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
-        db.session.add(user)
-        db.session.commit()
+        conn = get_db_connection()
+        conn.execute('INSERT INTO user (username, email, password, image_file) VALUES (?, ?, ?, ?)',
+                     (form.username.data, form.email.data, hashed_password, 'default.jpg'))
+        conn.commit()
+        conn.close()
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
@@ -102,9 +102,11 @@ def login():
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user)
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM user WHERE email = ?', (form.email.data,)).fetchone()
+        conn.close()
+        if user and bcrypt.check_password_hash(user['password'], form.password.data):
+            login_user(User(user['id'], user['username'], user['email'], user['image_file'], user['password']))
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
@@ -121,9 +123,11 @@ def logout():
 def new_story():
     form = StoryForm()
     if form.validate_on_submit():
-        story = Story(title=form.title.data, content=form.content.data, author=current_user)
-        db.session.add(story)
-        db.session.commit()
+        conn = get_db_connection()
+        conn.execute('INSERT INTO story (title, content, user_id, date_posted) VALUES (?, ?, ?, ?)',
+                     (form.title.data, form.content.data, current_user.id, datetime.utcnow()))
+        conn.commit()
+        conn.close()
         flash('Your story has been created!', 'success')
         return redirect(url_for('home'))
     return render_template('new_story.html', title='New Story', form=form)
@@ -131,12 +135,18 @@ def new_story():
 @app.route("/story/<int:story_id>", methods=['GET', 'POST'])
 @login_required
 def add_story(story_id):
-    story = Story.query.get_or_404(story_id)
+    conn = get_db_connection()
+    story = conn.execute('SELECT * FROM story WHERE id = ?', (story_id,)).fetchone()
+    conn.close()
+    if not story:
+        return redirect(url_for('home'))
     form = ContributionForm()
     if form.validate_on_submit():
-        contribution = Contribution(content=form.content.data, contributor=current_user, story=story)
-        db.session.add(contribution)
-        db.session.commit()
+        conn = get_db_connection()
+        conn.execute('INSERT INTO contribution (content, user_id, story_id, date_posted) VALUES (?, ?, ?, ?)',
+                     (form.content.data, current_user.id, story_id, datetime.utcnow()))
+        conn.commit()
+        conn.close()
         flash('Your contribution has been added!', 'success')
         return redirect(url_for('home'))
     return render_template('add_story.html', title='Add to Story', form=form, story=story)
