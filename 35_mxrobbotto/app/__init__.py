@@ -19,6 +19,53 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def init_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Create user table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS user (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL UNIQUE,
+        image_file TEXT NOT NULL DEFAULT 'default.jpg',
+        password TEXT NOT NULL
+    )
+    ''')
+    
+    # Create story table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS story (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        date_posted TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        content TEXT NOT NULL,
+        user_id INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES user (id)
+    )
+    ''')
+    
+    # Create contribution table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS contribution (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT NOT NULL,
+        date_posted TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        user_id INTEGER NOT NULL,
+        story_id INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES user (id),
+        FOREIGN KEY (story_id) REFERENCES story (id)
+    )
+    ''')
+    
+    conn.commit()
+    conn.close()
+
+@app.before_first_request
+def initialize_database():
+    init_db()
+
 @login_manager.user_loader
 def load_user(user_id):
     conn = get_db_connection()
@@ -76,9 +123,40 @@ class ContributionForm(FlaskForm):
 @login_required
 def home():
     conn = get_db_connection()
-    stories = conn.execute('SELECT * FROM story').fetchall()
+    stories = conn.execute('''
+        SELECT s.id, s.title, s.date_posted, s.content, u.username
+        FROM story s
+        JOIN user u ON s.user_id = u.id
+        WHERE s.user_id = ?
+    ''', (current_user.id,)).fetchall()
     conn.close()
     return render_template('home.html', stories=stories)
+
+@app.route("/stories")
+@login_required
+def all_stories():
+    conn = get_db_connection()
+    stories = conn.execute('''
+        SELECT s.id, s.title, s.date_posted, u.username
+        FROM story s
+        JOIN user u ON s.user_id = u.id
+    ''').fetchall()
+    conn.close()
+    return render_template('all_stories.html', stories=stories)
+
+@app.route("/story/<int:story_id>")
+@login_required
+def view_story(story_id):
+    conn = get_db_connection()
+    story = conn.execute('SELECT * FROM story WHERE id = ?', (story_id,)).fetchone()
+    latest_contribution = conn.execute('''
+        SELECT * FROM contribution
+        WHERE story_id = ?
+        ORDER BY date_posted DESC
+        LIMIT 1
+    ''', (story_id,)).fetchone()
+    conn.close()
+    return render_template('view_story.html', story=story, latest_contribution=latest_contribution)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -132,11 +210,17 @@ def new_story():
         return redirect(url_for('home'))
     return render_template('new_story.html', title='New Story', form=form)
 
-@app.route("/story/<int:story_id>", methods=['GET', 'POST'])
+@app.route("/story/<int:story_id>/add", methods=['GET', 'POST'])
 @login_required
 def add_story(story_id):
     conn = get_db_connection()
     story = conn.execute('SELECT * FROM story WHERE id = ?', (story_id,)).fetchone()
+    latest_contribution = conn.execute('''
+        SELECT * FROM contribution
+        WHERE story_id = ?
+        ORDER BY date_posted DESC
+        LIMIT 1
+    ''', (story_id,)).fetchone()
     conn.close()
     if not story:
         return redirect(url_for('home'))
@@ -149,4 +233,7 @@ def add_story(story_id):
         conn.close()
         flash('Your contribution has been added!', 'success')
         return redirect(url_for('home'))
-    return render_template('add_story.html', title='Add to Story', form=form, story=story)
+    return render_template('add_story.html', title='Add to Story', form=form, story=story, latest_contribution=latest_contribution)
+
+if __name__ == '__main__':
+    app.run(debug=True)
